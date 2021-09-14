@@ -4,6 +4,11 @@ from bs4 import BeautifulSoup
 import lxml
 from aiohttp import ClientSession
 from multiprocessing.pool import ThreadPool
+from time import sleep
+import csv
+from shutil import copyfile
+from selenium.webdriver.chrome.options import Options
+from selenium import webdriver
 
 headers = {
         "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
@@ -14,18 +19,30 @@ urls = ['https://www.saksoff5th.com/on/demandware.store/Sites-SaksOff5th-Site/en
 'https://www.saksoff5th.com/c/women/apparel/armani-jeans_boss-hugo-boss_calvin-klein_calvin-klein-jeans_calvin-klein-performance_ck-jeans_dkny_dkny-sport_guess_karl-lagerfeld_karl-lagerfeld-paris_kenzo1_lacoste_loro-piana_michael-kors_michael-michael-kors_msgm_ralph-lauren_tommy-hilfiger_tommy-hilfiger-sport?srule=featured_newest']
 url = 'https://www.saksoff5th.com'
 
-async def main(main_link):
-    async with ClientSession(headers=headers) as session:
-        async with session.get(main_link) as response:
-            page_content = await response.text()
-            with open('test.html','w') as f:
-                f.write(page_content)
-            big_soup = BeautifulSoup(page_content,'lxml')
-            all_blocks = big_soup.find_one(class_='row product-grid')
-            print(all_blocks.content)
+chrome_options = Options()
+chrome_options.add_argument(
+            "user-agent=Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4147.125 Safari/537.36")
+chrome_options.add_argument('--disable-extensions')
+chrome_options.add_argument('--no-sandbox')
+chrome_options.add_argument('--disable-dev-shm-usage')
+prefs = {"profile.managed_default_content_settings.images": 2}
+chrome_options.add_experimental_option("prefs", prefs)
+#chrome_options.add_argument("--headless")
+chrome_options.add_argument('--log-level=3')
+chrome_options.add_argument("start-maximized")
+chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+chrome_options.add_experimental_option('useAutomationExtension', False)
+chrome_options.add_argument('--disable-blink-features=AutomationControlled')
+browser = webdriver.Chrome(executable_path='./chromedriver',options=chrome_options)
+browser.implicitly_wait(5)
+
+def main(main_link):
+    browser.get(main_link)
             
 loop = asyncio.get_event_loop()
 if __name__ == '__main__':
     while True:
         for link in urls:
-            loop.run_until_complete(main(link))
+            main(link)
+        print('finished')
+        sleep(60)
