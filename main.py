@@ -28,6 +28,10 @@ urls = ['https://www.macys.com/shop/sale/Brand,Business_category/A%257CX%20Arman
 ,'https://www.nordstromrack.com/shop/Women/Shoes?breadcrumb=Home%2FShoes%2FWomen%27s%20Shoes&origin=topnav&filterByBrand=calvin-klein&filterByBrand=coach&filterByBrand=dkny&filterByBrand=dr-martens&filterByBrand=dr-martens&filterByBrand=karl-lagerfeld-paris&filterByBrand=michael-kors&filterByBrand=michael-michael-kors&filterByBrand=michael-michael-kors&filterByBrand=moschino&filterByBrand=steve-madden&filterByBrand=timberland&filterByBrand=tommy-hilfiger&filterByBrand=ugg'
 ,'https://www.nordstromrack.com/shop/women/handbags?filterByBrand=calvin-klein&filterByBrand=coach&filterByBrand=coach&filterByBrand=coccinelle&filterByBrand=dkny&filterByBrand=karl-lagerfeld-paris&filterByBrand=marc-by-marc-jacobs&filterByBrand=marc-jacobs&filterByBrand=michael-kors&filterByBrand=michael-michael-kors&filterByBrand=moschino&filterByBrand=tommy-hilfiger']
 
+urls = ['https://www.saksoff5th.com/c/shoes/ash_australia-luxe-collective_calvin-klein-jeans_karl-lagerfeld-paris_kenzo1_michael-kors_michael-michael-kors_steve-madden_tommy-hilfiger_ugg?srule=featured_newest'
+,'https://www.saksoff5th.com/c/women/apparel/armani-jeans_boss-hugo-boss_calvin-klein_calvin-klein-jeans_calvin-klein-performance_ck-jeans_dkny_dkny-sport_guess_karl-lagerfeld_karl-lagerfeld-paris_kenzo1_lacoste_loro-piana_michael-kors_michael-michael-kors_msgm_ralph-lauren_tommy-hilfiger_tommy-hilfiger-sport?srule=featured_newest'
+,'https://www.saksoff5th.com/c/handbags/coach1_furla_karl-lagerfeld-paris_marc-jacobs_zac-zac-posen?srule=featured_newest'
+,'https://usa.tommy.com/en/tommy-hilfiger-sale']
 
 chrome_options = Options()
 chrome_options.add_argument(
@@ -35,9 +39,9 @@ chrome_options.add_argument(
 chrome_options.add_argument('--disable-extensions')
 chrome_options.add_argument('--no-sandbox')
 chrome_options.add_argument('--disable-dev-shm-usage')
-# prefs = {"profile.managed_default_content_settings.images": 2}
-# chrome_options.add_experimental_option("prefs", prefs)
-# chrome_options.add_argument("--headless")
+prefs = {"profile.managed_default_content_settings.images": 2}
+chrome_options.add_experimental_option("prefs", prefs)
+chrome_options.add_argument("--headless")
 chrome_options.add_argument('--log-level=3')
 chrome_options.add_argument("start-maximized")
 chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
@@ -47,20 +51,46 @@ browser = webdriver.Chrome(executable_path='./chromedriver',options=chrome_optio
 browser.implicitly_wait(5)
 
 def saksoff(main_link):
-    url = 'https://www.saksoff5th.com'
-    update_link ='https://www.saksoff5th.com/on/demandware.store/Sites-SaksOff5th-Site/en_US/Search-UpdateGrid?'
-    button = browser.find_elements_by_class_name('consent-tracking-close')
-    if button:
-        button.click()
     browser.get(main_link)
+    update_link ='https://www.saksoff5th.com/on/demandware.store/Sites-SaksOff5th-Site/en_US/Search-UpdateGrid?'
+    count = int(browser.find_element_by_class_name('search-count').get_attribute('data-search-count'))
     all_data_link=browser.find_element_by_xpath('//div[@data-action="Search-Show"]').get_attribute('data-querystring')
-    browser.get(update_link+all_data_link)
-    all_blocks = browser.find_elements_by_xpath('//div[@class="col-6 col-sm-4 col-xl-3"]')
-    for block in all_blocks:
-        price = browser.find_element_by_xpath('//div[@class="col-6 col-sm-4 col-xl-3"]//span[@class="prod-price"]')
-        link = browser.find_element_by_xpath('//div[@class="col-6 col-sm-4 col-xl-3"]//span[@class="prod-price"]')
-        image = browser.find_element_by_xpath('//div[@class="col-6 col-sm-4 col-xl-3"]//span[@class="prod-price"]')
-        print(link.text)
+    start = 0
+    with open('test.txt','w') as f:
+        while start < count:
+            browser.get(update_link+all_data_link+f'&start={start}')
+            namesandlinks = browser.find_elements_by_xpath('//div[@class="col-6 col-sm-4 col-xl-3"]//a[@class="link"]')
+            prices = browser.find_elements_by_xpath('//div[@class="col-6 col-sm-4 col-xl-3"]//span[@class="prod-price"]')
+            image_blocks = browser.find_elements_by_xpath('//div[@class="col-6 col-sm-4 col-xl-3"]//div[@class="image-container"]//a[@class="thumb-link"]')
+            for i in range(len(namesandlinks)):
+                f.write(prices[i*2].text+'\n')
+                f.write(namesandlinks[i].text+'\n')
+                f.write(namesandlinks[i].get_attribute('href')+'\n')
+                f.write(image_blocks[i].find_element_by_class_name('tile-image').get_attribute('src')+'\n\n')
+            start += len(namesandlinks)
+
+def tommy(main_link):
+    browser.get(main_link)
+    button = browser.find_elements_by_xpath('//div[@class="pvhOverlayCloseX"]')
+    if button:
+        button[0].click()
+    browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    img_links = browser.find_elements_by_xpath("//div[contains(@class,'productCell processed')]//span[@itemprop='url']")
+    links = browser.find_elements_by_xpath("//div[contains(@class,'productCell processed')]//span[@itemprop='image']")
+    names = browser.find_elements_by_xpath("//div[contains(@class,'productCell processed')]//div[contains(@class,'productInfo')]//div[@class='productName']")
+    prices = browser.find_elements_by_xpath("//div[contains(@class,'productCell processed')]//div[contains(@class,'productInfo')]//div[@class='productPrice ']//div[@id='price_display']//span")
+    msg = browser.find_elements_by_xpath("//div[contains(@class,'productCell processed')]//div[contains(@class,'productInfo')]//div[contains(@class,'promoMessage')]//span")
+    with open('tommy.txt','w') as f:
+        for i in range(len(names)):
+            img_link = img_links[i].get_attribute('content')
+            name = names[i].text
+            img_link = links[i].get_attribute('content')
+            print(name,img_link)
+            print(link)
+            price = prices[i*2].text+prices[i*2+1].text
+            all_message = msg[i].text+'\n'+price
+            print(all_message)
+            f.write(name+'\n'+link+'\n'+img_link+'\n'+all_message+'\n\n')
 
 def michael(main_link):
     pass
@@ -69,9 +99,6 @@ def macys(main_link):
     pass
 
 def bloomingdales(main_link):
-    pass
-
-def tommy(main_link):
     pass
 
 def nordstromrack(main_link):
@@ -87,7 +114,7 @@ funcs = {
     'https://www.macys':macys,
     'https://usa.tommy':tommy,
     'https://www.bloomingdales':bloomingdales,
-    'https://www.donnakaran':donnakaran(),
+    'https://www.donnakaran':donnakaran,
     'https://www.nordstromrack':nordstromrack
 }
 
