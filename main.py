@@ -15,9 +15,19 @@ headers = {
         "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.106 Safari/537.36"
     }
 
-urls = ['https://www.saksoff5th.com/on/demandware.store/Sites-SaksOff5th-Site/en_US/Search-UpdateGrid?cgid=1549042144829&prefn1=brand&prefv1=Ash|Australia%20Luxe%20Collective|Calvin%20Klein%20Jeans|Karl%20Lagerfeld%20Paris|KENZO|Michael%20Kors|MICHAEL%20Michael%20Kors|Steve%20Madden|Tommy%20Hilfiger|UGG&srule=featured_newest&start=0&sz=24&filter=true&selectedUrl=https%3A%2F%2Fwww.saksoff5th.com%2Fon%2Fdemandware.store%2FSites-SaksOff5th-Site%2Fen_US%2FSearch-UpdateGrid%3Fcgid%3D1549042144829%26prefn1%3Dbrand%26prefv1%3DAsh%257cAustralia%2520Luxe%2520Collective%257cCalvin%2520Klein%2520Jeans%257cKarl%2520Lagerfeld%2520Paris%257cKENZO%257cMichael%2520Kors%257cMICHAEL%2520Michael%2520Kors%257cSteve%2520Madden%257cTommy%2520Hilfiger%257cUGG%26srule%3Dfeatured_newest%26start%3D72%26sz%3D24%26filter%3Dtrue&showMore=true',
-'https://www.saksoff5th.com/c/women/apparel/armani-jeans_boss-hugo-boss_calvin-klein_calvin-klein-jeans_calvin-klein-performance_ck-jeans_dkny_dkny-sport_guess_karl-lagerfeld_karl-lagerfeld-paris_kenzo1_lacoste_loro-piana_michael-kors_michael-michael-kors_msgm_ralph-lauren_tommy-hilfiger_tommy-hilfiger-sport?srule=featured_newest']
-url = 'https://www.saksoff5th.com'
+urls = ['https://www.macys.com/shop/sale/Brand,Business_category/A%257CX%20Armani%20Exchange%7CArmani%20Exchange%7CCalvin%20Klein%7CCalvin%20Klein%20Jeans%7CCOACH%7CDKNY%7CDKNY%20Jeans%7CEmporio%20Armani%7CGUESS%7CHUGO%7CHugo%20Boss%7CKarl%20Lagerfeld%7CKarl%20Lagerfeld%20Paris%7CLacoste%7CLevi%27s%7CMarc%20Jacobs%7CMichael%20Kors%7CPolo%20Ralph%20Lauren%7CRalph%20by%20Ralph%20Lauren%7CRalph%20Lauren%7CSteve%20Madden%7CTommy%20Hilfiger%7CTommy%20Jeans%7CUGG%C2%AE,Handbags%20%26%20Accessories%7CKids%20%26%20Baby%7CMen%7CMen%27s%20Shoes%7CWomen%7CWomen%27s%20Shoes?id=3536'
+,'https://www.saksoff5th.com/c/shoes/ash_australia-luxe-collective_calvin-klein-jeans_karl-lagerfeld-paris_kenzo1_michael-kors_michael-michael-kors_steve-madden_tommy-hilfiger_ugg?srule=featured_newest'
+,'https://www.saksoff5th.com/c/women/apparel/armani-jeans_boss-hugo-boss_calvin-klein_calvin-klein-jeans_calvin-klein-performance_ck-jeans_dkny_dkny-sport_guess_karl-lagerfeld_karl-lagerfeld-paris_kenzo1_lacoste_loro-piana_michael-kors_michael-michael-kors_msgm_ralph-lauren_tommy-hilfiger_tommy-hilfiger-sport?srule=featured_newest'
+,'https://www.saksoff5th.com/c/handbags/coach1_furla_karl-lagerfeld-paris_marc-jacobs_zac-zac-posen?srule=featured_newest'
+,'https://usa.tommy.com/en/tommy-hilfiger-sale'
+,'https://www.bloomingdales.com/shop/sale/sale-and-clearance/Brand/Armani%7CAsh%7CCalvin%20Klein%7CCOACH%7CDKNY%7CKARL%20LAGERFELD%20PARIS%7CKenzo%7CLacoste%7CMARC%20JACOBS%7CMichael%20Kors%7CMICHAEL%20Michael%20Kors%7CPolo%20Ralph%20Lauren%7CRalph%20Lauren%7CUGG%C2%AE?id=1003304'
+,'https://www.michaelkors.com/sale/view-all-sale/_/N-28zn'
+,'https://www.donnakaran.com/category/dkny/sale/womens+sale+view+all.do'
+,'https://www.donnakaran.com/category/dkny/sale/mens+sale+view+all.do'
+,'https://www.nordstromrack.com/shop/Women/Clothing?breadcrumb=Home%2FWomen%2FClothing&origin=topnav&filterByBrand=calvin-klein&filterByBrand=dkny&filterByBrand=guess&filterByBrand=karl-lagerfeld-paris&filterByBrand=michael-kors&filterByBrand=tommy-hilfiger'
+,'https://www.nordstromrack.com/shop/Women/Shoes?breadcrumb=Home%2FShoes%2FWomen%27s%20Shoes&origin=topnav&filterByBrand=calvin-klein&filterByBrand=coach&filterByBrand=dkny&filterByBrand=dr-martens&filterByBrand=dr-martens&filterByBrand=karl-lagerfeld-paris&filterByBrand=michael-kors&filterByBrand=michael-michael-kors&filterByBrand=michael-michael-kors&filterByBrand=moschino&filterByBrand=steve-madden&filterByBrand=timberland&filterByBrand=tommy-hilfiger&filterByBrand=ugg'
+,'https://www.nordstromrack.com/shop/women/handbags?filterByBrand=calvin-klein&filterByBrand=coach&filterByBrand=coach&filterByBrand=coccinelle&filterByBrand=dkny&filterByBrand=karl-lagerfeld-paris&filterByBrand=marc-by-marc-jacobs&filterByBrand=marc-jacobs&filterByBrand=michael-kors&filterByBrand=michael-michael-kors&filterByBrand=moschino&filterByBrand=tommy-hilfiger']
+
 
 chrome_options = Options()
 chrome_options.add_argument(
@@ -25,9 +35,9 @@ chrome_options.add_argument(
 chrome_options.add_argument('--disable-extensions')
 chrome_options.add_argument('--no-sandbox')
 chrome_options.add_argument('--disable-dev-shm-usage')
-prefs = {"profile.managed_default_content_settings.images": 2}
-chrome_options.add_experimental_option("prefs", prefs)
-#chrome_options.add_argument("--headless")
+# prefs = {"profile.managed_default_content_settings.images": 2}
+# chrome_options.add_experimental_option("prefs", prefs)
+# chrome_options.add_argument("--headless")
 chrome_options.add_argument('--log-level=3')
 chrome_options.add_argument("start-maximized")
 chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
@@ -36,13 +46,55 @@ chrome_options.add_argument('--disable-blink-features=AutomationControlled')
 browser = webdriver.Chrome(executable_path='./chromedriver',options=chrome_options)
 browser.implicitly_wait(5)
 
-def main(main_link):
+def saksoff(main_link):
+    url = 'https://www.saksoff5th.com'
+    update_link ='https://www.saksoff5th.com/on/demandware.store/Sites-SaksOff5th-Site/en_US/Search-UpdateGrid?'
+    button = browser.find_elements_by_class_name('consent-tracking-close')
+    if button:
+        button.click()
     browser.get(main_link)
-            
+    all_data_link=browser.find_element_by_xpath('//div[@data-action="Search-Show"]').get_attribute('data-querystring')
+    browser.get(update_link+all_data_link)
+    all_blocks = browser.find_elements_by_xpath('//div[@class="col-6 col-sm-4 col-xl-3"]')
+    for block in all_blocks:
+        price = browser.find_element_by_xpath('//div[@class="col-6 col-sm-4 col-xl-3"]//span[@class="prod-price"]')
+        link = browser.find_element_by_xpath('//div[@class="col-6 col-sm-4 col-xl-3"]//span[@class="prod-price"]')
+        image = browser.find_element_by_xpath('//div[@class="col-6 col-sm-4 col-xl-3"]//span[@class="prod-price"]')
+        print(link.text)
+
+def michael(main_link):
+    pass
+
+def macys(main_link):
+    pass
+
+def bloomingdales(main_link):
+    pass
+
+def tommy(main_link):
+    pass
+
+def nordstromrack(main_link):
+    pass
+    
+def donnakaran(main_link):
+    pass
+
+
+funcs = {
+    'https://www.saksoff5th':saksoff,
+    'https://www.michaelkors':michael,
+    'https://www.macys':macys,
+    'https://usa.tommy':tommy,
+    'https://www.bloomingdales':bloomingdales,
+    'https://www.donnakaran':donnakaran(),
+    'https://www.nordstromrack':nordstromrack
+}
+
 loop = asyncio.get_event_loop()
 if __name__ == '__main__':
     while True:
         for link in urls:
-            main(link)
+            funcs[link.split('.com')[0]](link)
         print('finished')
         sleep(60)
