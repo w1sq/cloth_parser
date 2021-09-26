@@ -1,13 +1,12 @@
 from pyrogram import Client
 from pathlib import Path
 
+with open('auth_data.txt','r',encoding='utf-8') as f:
+    data = f.read().split('\n')
 
-API_ID = 7156723
-API_HASH = 'bee99f46cea8eb54676e5258eb906ce1'
-PHONE_NUMBER = '+79152409140'
+app = Client("userinviter", api_id=data[0], api_hash=data[1],
+             phone_number=data[2])
 
-app = Client("sender", api_id=API_ID, api_hash=API_HASH,
-             phone_number=PHONE_NUMBER)
 
 if __name__ == '__main__':
     with open(f'message.txt','r',encoding='utf-8') as message:

@@ -8,7 +8,6 @@ from selenium.webdriver.chrome.options import Options
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
-from bot import send,loop
 
 headers = {
         "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
@@ -45,18 +44,21 @@ browser = webdriver.Chrome(executable_path='./chromedriver',options=chrome_optio
 browser.implicitly_wait(5)
 
 
-def saksoff(main_link,id):
+def saksoff(main_link,id,response):
     browser.get(main_link)
-    update_link ='https://www.saksoff5th.com/on/demandware.store/Sites-SaksOff5th-Site/en_US/Search-UpdateGrid?'
+    link = f'https://www.saksoff5th.com/on/demandware.store/Sites-SaksOff5th-Site/en_US/Search-UpdateGrid?prefv1={main_link.split("/")[-1]}&srule=featured_newest&showMore=true'
     count = int(browser.find_element_by_class_name('search-count').get_attribute('data-search-count'))
-    all_data_link=browser.find_element_by_xpath('//div[@data-action="Search-Show"]').get_attribute('data-querystring')
     start = 0
     now_results = {}
-    with open(id+'.json','r') as f:
-        old_results =  json.loads(f.read())
-    with open(id+'.json','w') as f:
+    with open(str(id)+'.json','r') as f:
+        data = f.read()
+        if data:
+            old_results =  json.loads(data)
+        else:
+            old_results = {}
+    with open(str(id)+'.json','w') as f:
         while start < count:
-            browser.get(update_link+all_data_link+f'&start={start}')
+            browser.get(link+f'&start={start}')
             namesandlinks = browser.find_elements_by_xpath('//div[@class="col-6 col-sm-4 col-xl-3"]//a[@class="link"]')
             prices = browser.find_elements_by_xpath('//div[@class="col-6 col-sm-4 col-xl-3"]//span[@class="prod-price"]')
             image_blocks = browser.find_elements_by_xpath('//div[@class="col-6 col-sm-4 col-xl-3"]//div[@class="image-container"]//a[@class="thumb-link"]')
@@ -69,7 +71,7 @@ def saksoff(main_link,id):
                     product_link = namesandlinks[i].get_attribute('href')
                     if product_link in old_results.keys() and old_results[product_link]['new_price'] < new_price or product_link not in old_results.keys():
                         print(1)
-                        loop.create_task(send(f"<a href='{img_link}'>&#8205</a>\n{name}\n{all_price}\n{product_link}"))
+                        response.append(f"<a href='{img_link}'>&#8205</a>\n{name}\n{all_price}\n{product_link}")
                     now_results[namesandlinks[i].get_attribute('href')]={
                         'name':name,
                         'img_link':img_link,
@@ -80,7 +82,7 @@ def saksoff(main_link,id):
         json.dump(now_results,f)
 
 
-def tommy(main_link,id):
+def tommy(main_link,id,response):
     browser.get(main_link)
     button = browser.find_elements_by_xpath('//div[@class="pvhOverlayCloseX"]')
     if button:
@@ -91,9 +93,13 @@ def tommy(main_link,id):
     names = browser.find_elements_by_xpath("//div[contains(@class,'productCell processed')]//div[contains(@class,'productInfo')]//div[@class='productName']")
     prices = browser.find_elements_by_xpath("//div[contains(@class,'productCell processed')]//div[contains(@class,'productInfo')]//div[@class='productPrice ']//div[@id='price_display']")
     now_results = {}
-    with open(id+'.json','r') as f:
-        old_results =  json.loads(f.read())
-    with open(id+'.json','w') as f:
+    with open(str(id)+'.json','r') as f:
+        data = f.read()
+        if data:
+            old_results =  json.loads(data)
+        else:
+            old_results = {}
+    with open(str(id)+'.json','w') as f:
         for i in range(len(names)):
             if len(r(prices[i].text).split()) == 1 and r(prices[i].text)[-1] in numbers and len(r(prices[i].text).split('$')) == 3:
                 item_link = items_links[i].get_attribute('content')
@@ -102,7 +108,7 @@ def tommy(main_link,id):
                 new_price = round(float(r(prices[i].text).split('$')[2]),0)
                 price = prices[i].text.split('$')[1]+' -> '+prices[i].text.split('$')[2]
                 if item_link in old_results.keys() and old_results[item_link]['new_price'] < new_price or item_link not in old_results.keys():
-                    loop.create_task(send(f"<a href='{img_link}'>&#8205</a>\n{name}\n{price}\n{item_link}"))
+                    response.append(f"<a href='{img_link}'>&#8205</a>\n{name}\n{price}\n{item_link}")
                 now_results[item_link] = {
                     'name':name,
                     'img_link':img_link,
@@ -113,7 +119,7 @@ def tommy(main_link,id):
 
 
 
-def michael(main_link,id):
+def michael(main_link,id,response):
     def_prod_link = 'https://www.michaelkors.com'
     def_img_link = 'https://michaelkors.scene7.com/is/image/'
     n=1
@@ -122,9 +128,13 @@ def michael(main_link,id):
     jsondata = json.loads(browser.find_element_by_xpath('//pre').text)
     count=int(jsondata['result']['totalProducts'])
     now_results = {}
-    with open(id+'.json','r') as f:
-        old_results =  json.loads(f.read())
-    with open(id+'.json','w') as f:
+    with open(str(id)+'.json','r') as f:
+        data = f.read()
+        if data:
+            old_results =  json.loads(data)
+        else:
+            old_results = {}
+    with open(str(id)+'.json','w') as f:
         while n<count:
             link = f'https://www.michaelkors.com/server/data/guidedSearch?stateIdentifier={main_link.split("view-all-sale/")[-1]}&No={n}&Nrpp=42'
             browser.get(link)
@@ -136,7 +146,7 @@ def michael(main_link,id):
                 old_price = round(float(product['prices']['highListPrice']),0)
                 new_price = round(float(product['prices']['lowSalePrice']),0)
                 if item_link in old_results.keys() and old_results[item_link]['new_price'] < new_price or item_link not in old_results.keys():
-                    loop.create_task(send(f"<a href='{img_link}'>&#8205</a>\n{name}\n{str(old_price)+'->'+str(new_price)}\n{item_link}"))
+                    response.append(f"<a href='{img_link}'>&#8205</a>\n{name}\n{str(old_price)+'->'+str(new_price)}\n{item_link}")
                 now_results[item_link]={
                     'name':name,
                     'img_link':img_link,
@@ -147,16 +157,20 @@ def michael(main_link,id):
 
 
 
-def macys(main_link,id):    
+def macys(main_link,id,response):    
     n = 1
     link = f'https://www.macys.com/shop/sale/Brand,Business_category,Pageindex,Productsperpage/A%257CX%20Armani%20Exchange%7CArmani%20Exchange%7CCalvin%20Klein%7CCalvin%20Klein%20Jeans%7CCOACH%7CDKNY%7CDKNY%20Jeans%7CEmporio%20Armani%7CGUESS%7CHUGO%7CHugo%20Boss%7CKarl%20Lagerfeld%7CKarl%20Lagerfeld%20Paris%7CLacoste%7CLevi%27s%7CMarc%20Jacobs%7CMichael%20Kors%7CPolo%20Ralph%20Lauren%7CRalph%20by%20Ralph%20Lauren%7CRalph%20Lauren%7CSteve%20Madden%7CTommy%20Hilfiger%7CTommy%20Jeans%7CUGG%C2%AE,Handbags%20%26%20Accessories%7CKids%20%26%20Baby%7CMen%7CMen%27s%20Shoes%7CWomen%7CWomen%27s%20Shoes.120,{n},120?id=3536'
     browser.get(link)
     selection = len(browser.find_elements_by_xpath("//div[@id='filterResultsBottom']//ul[@class='filters']//li[@class='pagination']//ul[@class='pagePagination']//li//select[@id='select-page']//option"))
     if selection:
         now_results = {}
-        with open(id+'.json','r') as f:
-            old_results =  json.loads(f.read())
-        with open(id+'.json','w') as f:
+    with open(str(id)+'.json','r') as f:
+        data = f.read()
+        if data:
+            old_results =  json.loads(data)
+        else:
+            old_results = {}
+        with open(str(id)+'.json','w') as f:
             while n<selection:
                 browser.get(link)
                 browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
@@ -171,7 +185,7 @@ def macys(main_link,id):
                         new_price = round(float(r(all_prices[i].text).split()[-1].replace('$','')),0)
                         all_price = r(all_prices[i].text)
                         if item_link in old_results.keys() and old_results[item_link]['new_price'] < new_price or item_link not in old_results.keys():
-                            loop.create_task(send(f"<a href='{img_link}'>&#8205</a>\n{name}\n{all_price}\n{item_link}"))
+                            response.append(f"<a href='{img_link}'>&#8205</a>\n{name}\n{all_price}\n{item_link}")
                         now_results[item_link]={
                             'name':name,
                             'img_link':img_link,
@@ -185,15 +199,19 @@ def macys(main_link,id):
 
 
 
-def bloomingdales(main_link,id):
+def bloomingdales(main_link,id,response):
     n = 1
     link = f'https://www.bloomingdales.com/shop/sale/sale-and-clearance/Brand,Pageindex/Armani|Ash|Calvin%20Klein|COACH|DKNY|KARL%20LAGERFELD%20PARIS|Kenzo|Lacoste|MARC%20JACOBS|Michael%20Kors|MICHAEL%20Michael%20Kors|Polo%20Ralph%20Lauren|Ralph%20Lauren|UGG%C2%AE,{n}?id=1003304'
     browser.get(link)
     selection = len(browser.find_elements_by_xpath("//div[@id='filterBottom']//div[@class='paginationBottom']//ul[@class='newPagination']//li[@class='paginateContainer']//div[contains(@class,'sort-pagination')]//select[@id='sort-pagination-select-bottom']//option"))
     now_results = {}
-    with open(id+'.json','r') as f:
-        old_results =  json.loads(f.read())
-    with open(id+'.json','w') as f:
+    with open(str(id)+'.json','r') as f:
+        data = f.read()
+        if data:
+            old_results =  json.loads(data)
+        else:
+            old_results = {}
+    with open(str(id)+'.json','w') as f:
         while n<selection:
             link = f'https://www.bloomingdales.com/shop/sale/sale-and-clearance/Brand,Pageindex/Armani|Ash|Calvin%20Klein|COACH|DKNY|KARL%20LAGERFELD%20PARIS|Kenzo|Lacoste|MARC%20JACOBS|Michael%20Kors|MICHAEL%20Michael%20Kors|Polo%20Ralph%20Lauren|Ralph%20Lauren|UGG%C2%AE,{n}?id=1003304'
             browser.get(link)
@@ -211,7 +229,7 @@ def bloomingdales(main_link,id):
                     if len(r(all_prices[i].text).split()) == 5 and r(all_prices[i].text).endswith('OFF)'):
                         img_link = all_imgs[i].get_attribute('src')
                         if item_link in old_results.keys() and old_results[item_link]['new_price'] < new_price or item_link not in old_results.keys():
-                            loop.create_task(send(f"<a href='{img_link}'>&#8205</a>\n{name}\n{all_price}\n{item_link}"))
+                            response.append(f"<a href='{img_link}'>&#8205</a>\n{name}\n{all_price}\n{item_link}")
                         now_results[item_link] = {
                             'name': name,
                             'img_link':img_link,
@@ -222,7 +240,7 @@ def bloomingdales(main_link,id):
                     if len(r(all_prices[i].text).split()) == 5 and r(all_prices[i].text).endswith('OFF)'):
                         img_link = all_imgs[i].get_attribute('data-lazysrc')
                         if item_link in old_results.keys() and old_results[item_link]['new_price'] < new_price or item_link not in old_results.keys():
-                            loop.create_task(send(f"<a href='{img_link}'>&#8205</a>\n{name}\n{all_price}\n{item_link}"))
+                            response.append(f"<a href='{img_link}'>&#8205</a>\n{name}\n{all_price}\n{item_link}")
                         now_results[item_link] = {
                             'name': name,
                             'img_link':img_link,
@@ -233,7 +251,7 @@ def bloomingdales(main_link,id):
         json.dump(now_results,f)
 
 
-def nordstromrack(main_link,id):
+def nordstromrack(main_link,id,response):
     n = 1
     link = main_link + f'&page={n}'
     browser.get(link)
@@ -242,9 +260,13 @@ def nordstromrack(main_link,id):
     number = float(browser.find_element_by_xpath("//div[@id='product-results-view']//header//span[contains(.,'items')]").text.split()[0])
     count = 0
     now_results = {}
-    with open(id+'.json','r') as f:
-        old_results =  json.loads(f.read())
-    with open(id+'.json','w') as f:
+    with open(str(id)+'.json','r') as f:
+        data = f.read()
+        if data:
+            old_results =  json.loads(data)
+        else:
+            old_results = {}
+    with open(str(id)+'.json','w') as f:
         while count < number:
             link = main_link + f'&page={n}'
             browser.get(link)
@@ -262,7 +284,7 @@ def nordstromrack(main_link,id):
                 all_price = all_prices[i].text.replace('\n',' ')
                 item_link = all_links[i].get_attribute('href')
                 if item_link in old_results.keys() and old_results[item_link]['new_price'] < new_price or item_link not in old_results.keys():
-                    loop.create_task(send(f"<a href='{img_link}'>&#8205</a>\n{name}\n{all_price}\n{item_link}"))
+                    response.append(f"<a href='{img_link}'>&#8205</a>\n{name}\n{all_price}\n{item_link}")
                 now_results[item_link]={
                 'name':name,
                 'img_link':img_link,
@@ -274,15 +296,19 @@ def nordstromrack(main_link,id):
         json.dump(now_results,f)
     
 
-def donnakaran(main_link,id):
+def donnakaran(main_link,id,response):
     browser.get(main_link)
     all_images = browser.find_elements_by_xpath("//div[contains(@class,'ml-directory')]//div[contains(@class,'ml-grid-view')]//div[contains(@id,'ml-grid-view-items')]//div[@role='group']//a//div[contains(@class,'ml-thumb-wrapper')]//div[contains(@class,'ml-grid-item-image')]//img")
     all_names_and_links = browser.find_elements_by_xpath("//div[contains(@class,'ml-directory')]//div[contains(@class,'ml-grid-view')]//div[contains(@id,'ml-grid-view-items')]//div[@role='group']//a")
     all_prices = browser.find_elements_by_xpath("//div[contains(@class,'ml-directory')]//div[contains(@class,'ml-grid-view')]//div[contains(@id,'ml-grid-view-items')]//div[@role='group']//a//div[contains(@class,'ml-thumb-wrapper')]//div[contains(@class,'ml-grid-item-info')]//div[contains(@class,'ml-thumb-price')]")
     now_results = {}
-    with open(id+'.json','r') as f:
-        old_results =  json.loads(f.read())
-    with open(id+'.json','w') as f:
+    with open(str(id)+'.json','r') as f:
+        data = f.read()
+        if data:
+            old_results =  json.loads(data)
+        else:
+            old_results = {}
+    with open(str(id)+'.json','w') as f:
         for i in range(len(all_names_and_links)):
             name = all_names_and_links[i].get_attribute('data-item-name')
             img_link = all_images[i].get_attribute('src')
@@ -290,7 +316,7 @@ def donnakaran(main_link,id):
             all_price = all_prices[i].text.replace('\n',' ')
             item_link = all_names_and_links[i].get_attribute('href')
             if item_link in old_results.keys() and old_results[item_link]['new_price'] < new_price or item_link not in old_results.keys():
-                loop.create_task(send(f"<a href='{img_link}'>&#8205</a>\n{name}\n{all_price}\n{item_link}"))
+                response.append(f"<a href='{img_link}'>&#8205</a>\n{name}\n{all_price}\n{item_link}")
             now_results[item_link]={
                 'name':name,
                 'img_link':img_link,
@@ -312,9 +338,8 @@ funcs = {
     'https://www.nordstromrack':nordstromrack
 }
 
-if __name__ == '__main__':
-    while True:
-        for i in range(len(urls)):
-            funcs[urls[i].split('.com')[0]](urls[i],str(i))
-        print('finished')
-        sleep(60*30)
+def main():
+    response = []
+    for i in range(len(urls)):
+        funcs[urls[i].split('.com')[0]](urls[i],str(i),response)
+    return response
