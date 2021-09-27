@@ -47,12 +47,6 @@ urls = ['https://www.macys.com/shop/sale/Brand,Business_category,Pageindex,Produ
 ]
 # urls = [
 #     'https://www.bloomingdales.com/shop/sale/sale-and-clearance/Brand/Armani%7CAsh%7CCalvin%20Klein%7CCOACH%7CDKNY%7CKARL%20LAGERFELD%20PARIS%7CKenzo%7CLacoste%7CMARC%20JACOBS%7CMichael%20Kors%7CMICHAEL%20Michael%20Kors%7CPolo%20Ralph%20Lauren%7CRalph%20Lauren%7CUGG%C2%AE?id=1003304'
-# ,'https://www.michaelkors.com/sale/view-all-sale/_/N-28zn'
-# ,'https://www.donnakaran.com/category/dkny/sale/womens+sale+view+all.do?page=all'
-# ,'https://www.donnakaran.com/category/dkny/sale/mens+sale+view+all.do?page=all'
-# ,'https://www.nordstromrack.com/shop/Women/Clothing?breadcrumb=Home%2FWomen%2FClothing&origin=topnav&filterByBrand=calvin-klein&filterByBrand=dkny&filterByBrand=guess&filterByBrand=karl-lagerfeld-paris&filterByBrand=michael-kors&filterByBrand=tommy-hilfiger'
-# ,'https://www.nordstromrack.com/shop/Women/Shoes?breadcrumb=Home%2FShoes%2FWomen%27s%20Shoes&origin=topnav&filterByBrand=calvin-klein&filterByBrand=coach&filterByBrand=dkny&filterByBrand=dr-martens&filterByBrand=dr-martens&filterByBrand=karl-lagerfeld-paris&filterByBrand=michael-kors&filterByBrand=michael-michael-kors&filterByBrand=michael-michael-kors&filterByBrand=moschino&filterByBrand=steve-madden&filterByBrand=timberland&filterByBrand=tommy-hilfiger&filterByBrand=ugg'
-# ,'https://www.nordstromrack.com/shop/women/handbags?filterByBrand=calvin-klein&filterByBrand=coach&filterByBrand=coach&filterByBrand=coccinelle&filterByBrand=dkny&filterByBrand=karl-lagerfeld-paris&filterByBrand=marc-by-marc-jacobs&filterByBrand=marc-jacobs&filterByBrand=michael-kors&filterByBrand=michael-michael-kors&filterByBrand=moschino&filterByBrand=tommy-hilfiger'
 #  ]
 numbers = ['1', '2','3','4','5','6','7','8','9','0']
 chrome_options = Options()
@@ -90,7 +84,6 @@ def saksoff(main_link,id,response):
     with open(str(id)+'.json','w') as f:
         while start < count:
             browser.get(update_link+all_data_link+f'&start={start}')
-            print(update_link+all_data_link+f'&start={start}')
             namesandlinks = browser.find_elements_by_xpath('//div[@class="col-6 col-sm-4 col-xl-3"]//a[@class="link"]')
             prices = browser.find_elements_by_xpath('//div[@class="col-6 col-sm-4 col-xl-3"]//span[@class="prod-price"]')
             image_blocks = browser.find_elements_by_xpath('//div[@class="col-6 col-sm-4 col-xl-3"]//div[@class="image-container"]//a[@class="thumb-link"]')
@@ -215,19 +208,22 @@ def macys(main_link,id,response):
                 all_prices = browser.find_elements_by_xpath("//div[@class='cell']//ul[contains(@class,'items')]//li[contains(@class,'cell productThumbnailItem')]//div[contains(@class,'productThumbnail')]//div[contains(@class,'productDetail')]//div[contains(@class,'productDescription')]//div[contains(@class,'priceInfo')]//div[contains(@class,'prices')]")
                 for i in range(len(all_names_and_links)):
                     if len(r(all_prices[i].text).split()) == 3:
-                        name = r(all_names_and_links[i].text)
-                        item_link = all_names_and_links[i].get_attribute('href')
-                        img_link = all_imgs[i].get_attribute('src')
-                        new_price = round(float(r(all_prices[i].text).split()[-1].replace('$','')),0)
-                        all_price = r(all_prices[i].text)
-                        if item_link in old_results.keys() and old_results[item_link]['new_price'] < new_price or item_link not in old_results.keys():
-                            response.append(f"<a href='{img_link}'>&#8205</a>\n{name}\n{all_price}\n{item_link}")
-                        now_results[item_link]={
-                            'name':name,
-                            'img_link':img_link,
-                            'new_price':new_price,
-                            'all_price':all_price
-                        }
+                        try:
+                            name = r(all_names_and_links[i].text)
+                            item_link = all_names_and_links[i].get_attribute('href')
+                            img_link = all_imgs[i].get_attribute('src')
+                            new_price = round(float(r(all_prices[i].text).split()[-1].replace('$','')),0)
+                            all_price = r(all_prices[i].text)
+                            if item_link in old_results.keys() and old_results[item_link]['new_price'] < new_price or item_link not in old_results.keys():
+                                response.append(f"<a href='{img_link}'>&#8205</a>\n{name}\n{all_price}\n{item_link}")
+                            now_results[item_link]={
+                                'name':name,
+                                'img_link':img_link,
+                                'new_price':new_price,
+                                'all_price':all_price
+                            }
+                        except Exception:
+                            pass
                 n+=1
             json.dump(now_results,f)
 
@@ -257,32 +253,35 @@ def bloomingdales(main_link,id,response):
             all_links = browser.find_elements_by_xpath("//div[contains(@class,'sortableGrid')]//ul[contains(@class,'items')]//li[contains(@class,'cell')]//div[contains(@class,'productThumbnail')]//a[contains(@class,'productDescLink')]")
             all_prices = browser.find_elements_by_xpath("//div[contains(@class,'sortableGrid')]//ul[contains(@class,'items')]//li[contains(@class,'cell')]//div[contains(@class,'productThumbnail')]//div[contains(@class,'productDetail')]//div[contains(@class,'priceInfo')]")
             for i in range(len(all_names)):
-                name = r(all_names[i].text)
-                new_price = round(float(r(all_prices[i].text).split()[2].replace('$','').replace(',','')),0)
-                all_price = r(all_prices[i].text)
-                item_link = all_links[i].get_attribute('href')
-                if i < 6:
-                    if len(r(all_prices[i].text).split()) == 5 and r(all_prices[i].text).endswith('OFF)'):
-                        img_link = all_imgs[i].get_attribute('src')
-                        if item_link in old_results.keys() and old_results[item_link]['new_price'] < new_price or item_link not in old_results.keys():
-                            response.append(f"<a href='{img_link}'>&#8205</a>\n{name}\n{all_price}\n{item_link}")
-                        now_results[item_link] = {
-                            'name': name,
-                            'img_link':img_link,
-                            'new_price':new_price,
-                            'all_price':all_price
-                            }
-                else:
-                    if len(r(all_prices[i].text).split()) == 5 and r(all_prices[i].text).endswith('OFF)'):
-                        img_link = all_imgs[i].get_attribute('data-lazysrc')
-                        if item_link in old_results.keys() and old_results[item_link]['new_price'] < new_price or item_link not in old_results.keys():
-                            response.append(f"<a href='{img_link}'>&#8205</a>\n{name}\n{all_price}\n{item_link}")
-                        now_results[item_link] = {
-                            'name': name,
-                            'img_link':img_link,
-                            'new_price':new_price,
-                            'all_price':all_price
-                            }
+                try:
+                    name = r(all_names[i].text)
+                    new_price = round(float(r(all_prices[i].text).split()[2].replace('$','').replace(',','')),0)
+                    all_price = r(all_prices[i].text)
+                    item_link = all_links[i].get_attribute('href')
+                    if i < 6:
+                        if len(r(all_prices[i].text).split()) == 5 and r(all_prices[i].text).endswith('OFF)'):
+                            img_link = all_imgs[i].get_attribute('src')
+                            if item_link in old_results.keys() and old_results[item_link]['new_price'] < new_price or item_link not in old_results.keys():
+                                response.append(f"<a href='{img_link}'>&#8205</a>\n{name}\n{all_price}\n{item_link}")
+                            now_results[item_link] = {
+                                'name': name,
+                                'img_link':img_link,
+                                'new_price':new_price,
+                                'all_price':all_price
+                                }
+                    else:
+                        if len(r(all_prices[i].text).split()) == 5 and r(all_prices[i].text).endswith('OFF)'):
+                            img_link = all_imgs[i].get_attribute('data-lazysrc')
+                            if item_link in old_results.keys() and old_results[item_link]['new_price'] < new_price or item_link not in old_results.keys():
+                                response.append(f"<a href='{img_link}'>&#8205</a>\n{name}\n{all_price}\n{item_link}")
+                            now_results[item_link] = {
+                                'name': name,
+                                'img_link':img_link,
+                                'new_price':new_price,
+                                'all_price':all_price
+                                }
+                except Exception:
+                    pass
             n+=1
         json.dump(now_results,f)
 
@@ -305,31 +304,34 @@ def nordstromrack(main_link,id,response):
             old_results = {}
     with open(str(id)+'.json','w') as f:
         while count < number:
-            link = main_link + f'&page={n}'
-            browser.get(link)
-            sleep(3)
-            browser.refresh()
-            all_imgs = browser.find_elements_by_xpath("//div[@id='product-results-view']//div//div//div//section//div//article//div[1]//img")
-            all_names = browser.find_elements_by_xpath("//div[@id='product-results-view']//div//div//div//section//div//article//h3")
-            all_prices = browser.find_elements_by_xpath("//div[@id='product-results-view']//div//div//div//section//div//article//div[contains(@class,'_2NEEx')]")
-            all_new_prices = browser.find_elements_by_xpath("//div[@id='product-results-view']//div//div//div//section//div//article//div[contains(@class,'_2NEEx')]//div[1]")
-            all_links = browser.find_elements_by_xpath("//div[@id='product-results-view']//div//div//div//section//div//article//a")
-            for i in range(len(all_imgs)):
-                name = all_names[i].text
-                img_link = all_imgs[i].get_attribute('src')
-                new_price = round(float(all_new_prices[i].text.split()[0].replace('$','')),0)
-                all_price = all_prices[i].text.replace('\n',' ')
-                item_link = all_links[i].get_attribute('href')
-                if item_link in old_results.keys() and old_results[item_link]['new_price'] < new_price or item_link not in old_results.keys():
-                    response.append(f"<a href='{img_link}'>&#8205</a>\n{name}\n{all_price}\n{item_link}")
-                now_results[item_link]={
-                'name':name,
-                'img_link':img_link,
-                'new_price':new_price,
-                'all_price':all_price
-            }
-            count += 72
-            n+=1
+            try:
+                link = main_link + f'&page={n}'
+                browser.get(link)
+                sleep(3)
+                browser.refresh()
+                all_imgs = browser.find_elements_by_xpath("//div[@id='product-results-view']//div//div//div//section//div//article//div[1]//img")
+                all_names = browser.find_elements_by_xpath("//div[@id='product-results-view']//div//div//div//section//div//article//h3")
+                all_prices = browser.find_elements_by_xpath("//div[@id='product-results-view']//div//div//div//section//div//article//div[contains(@class,'_2NEEx')]")
+                all_new_prices = browser.find_elements_by_xpath("//div[@id='product-results-view']//div//div//div//section//div//article//div[contains(@class,'_2NEEx')]//div[1]")
+                all_links = browser.find_elements_by_xpath("//div[@id='product-results-view']//div//div//div//section//div//article//a")
+                for i in range(len(all_imgs)):
+                    name = all_names[i].text
+                    img_link = all_imgs[i].get_attribute('src')
+                    new_price = round(float(all_new_prices[i].text.split()[0].replace('$','')),0)
+                    all_price = all_prices[i].text.replace('\n',' ')
+                    item_link = all_links[i].get_attribute('href')
+                    if item_link in old_results.keys() and old_results[item_link]['new_price'] < new_price or item_link not in old_results.keys():
+                        response.append(f"<a href='{img_link}'>&#8205</a>\n{name}\n{all_price}\n{item_link}")
+                    now_results[item_link]={
+                    'name':name,
+                    'img_link':img_link,
+                    'new_price':new_price,
+                    'all_price':all_price
+                }
+                count += 72
+                n+=1
+            except Exception:
+                pass
         json.dump(now_results,f)
     
 
@@ -348,19 +350,22 @@ def donnakaran(main_link,id,response):
             old_results = {}
     with open(str(id)+'.json','w') as f:
         for i in range(len(all_names_and_links)):
-            name = all_names_and_links[i].get_attribute('data-item-name')
-            img_link = all_images[i].get_attribute('src')
-            new_price = round(float(all_prices[i].text.split('\n')[-1].split()[-1].replace('$','')),0)
-            all_price = all_prices[i].text.replace('\n',' ')
-            item_link = all_names_and_links[i].get_attribute('href')
-            if item_link in old_results.keys() and old_results[item_link]['new_price'] < new_price or item_link not in old_results.keys():
-                response.append(f"<a href='{img_link}'>&#8205</a>\n{name}\n{all_price}\n{item_link}")
-            now_results[item_link]={
-                'name':name,
-                'img_link':img_link,
-                'new_price':new_price,
-                'all_price':all_price
-            }
+            try:
+                name = all_names_and_links[i].get_attribute('data-item-name')
+                img_link = all_images[i].get_attribute('src')
+                new_price = round(float(all_prices[i].text.split('\n')[-1].split()[-1].replace('$','')),0)
+                all_price = all_prices[i].text.replace('\n',' ')
+                item_link = all_names_and_links[i].get_attribute('href')
+                if item_link in old_results.keys() and old_results[item_link]['new_price'] < new_price or item_link not in old_results.keys():
+                    response.append(f"<a href='{img_link}'>&#8205</a>\n{name}\n{all_price}\n{item_link}")
+                now_results[item_link]={
+                    'name':name,
+                    'img_link':img_link,
+                    'new_price':new_price,
+                    'all_price':all_price
+                }
+            except Exception:
+                    pass
         json.dump(now_results,f)
 
 def r(string):
@@ -379,6 +384,7 @@ funcs = {
 def main():
     response = []
     for i in range(len(urls)):
+        print(urls[i])
         funcs[urls[i].split('.com')[0]](urls[i],str(i),response)
     return response
 
@@ -478,6 +484,7 @@ async def updation():
         for user in users:
             for message in fresh_news:
                 await bot.send_message(user.telegram_id, message, parse_mode='html')
+        print('finished')
         await asyncio.sleep(30*60)
 
 if __name__ == '__main__':
